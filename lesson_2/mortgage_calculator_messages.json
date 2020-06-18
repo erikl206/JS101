@@ -1,0 +1,12 @@
+{
+  "welcome" : "Welcome to the Mortage Calculator",
+  "loan" : "Enter the loan amount in dollars ($). - (ex: 100000)",
+  "interest" : "Enter the yearly interest rate in percentage (%) - (ex: 6.5):",
+  "duration" : "Enter the duration of the loan in years (ex: 30):",
+  "invalidLoanMsg" : "Invalid Entry! Please enter a number greater than 0",
+  "invalidDurationMsg" : "Invalid Entry! Please enter a positive integer (whole number)",
+  "invalidInterestMsg" : "Invalid Entry! Please enter a number 0 or greater",
+  "repeat" : "Would you like to run the mortage calculator again? \n=> Please enter 'yes' or 'no':",
+  "invalidRepeatMsg" : "Invalid Entry. Please enter 'yes' to run another calculation or 'no' to exit",
+  "error" : "I'm sorry, we encountered an error."
+}
