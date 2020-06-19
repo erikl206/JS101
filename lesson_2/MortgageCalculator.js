@@ -1,9 +1,5 @@
-/* eslint-disable max-len */
-/* eslint-disable max-statements */
 const readline = require('readline-sync');
 const MESSAGES = require('./mortgage_calculator_messages.json');
-
-// change functions to let functionName = (arguments) {}??
 
 function prompt(message) {
   console.log(`=> ${message}`);
@@ -27,12 +23,10 @@ function isInvalidInterest(input) {
          input === '';
 }
 
-function isInvalidRepeat(input) { //had trouble with this function
-  if (input === 'yes' ||
-      input === 'no'  ||
-      input === '') {
-    return null;
-  } else return true;
+function isInvalidRepeat(input) {
+  const VALID_REPEAT_ANSWERS = ['yes', 'no', 'y', 'n'];
+  input = input.toLowerCase();
+  return !VALID_REPEAT_ANSWERS.includes(input);
 }
 
 function cleanInput(input) {
@@ -40,12 +34,6 @@ function cleanInput(input) {
   input = input.replace('$', '');
   input = input.replace('%', '');
   input = input.replace(',', '');
-  return input;
-}
-
-function cleanRepeatInput(input) {
-  input = input.trim();
-  input = input.toLowerCase();
   input = input.replace("'", '');
   return input;
 }
@@ -53,43 +41,31 @@ function cleanRepeatInput(input) {
 function collectInput(message, validation, invalidMsg) {
   prompt(MESSAGES[message]);
   let input = readline.question();
-  if (message !== "repeat") {
-    input = cleanInput(input);
-  } else {
-    input = cleanRepeatInput(input);
-  }
+  input = cleanInput(input);
 
   while (validation(input)) {
     prompt(MESSAGES[invalidMsg]);
     input = readline.question();
-    if (message !== "repeat") {
-      input = cleanInput(input);
-    } else {
-      input = cleanRepeatInput(input);
+    input = cleanInput(input);
     }
-  }
   return input;
 }
 
 function displayResults(monthlyPayment, months, totalInterest, totalPayments) {
   prompt('-------------------------------------------------');
-  prompt(`Payment Every Month: $${numCommas(monthlyPayment.toFixed(2))}`);
-  prompt(`Total of ${months} Payments: $${numCommas(totalPayments.toFixed(2))}`);
-  prompt(`Total Interest: $${numCommas(totalInterest.toFixed(2))}`);
+  prompt(`Payment Every Month: $${addCommas(monthlyPayment.toFixed(2))}`);
+  prompt(`Total of ${months} Payments: $${addCommas(totalPayments.toFixed(2))}`);
+  prompt(`Total Interest: $${addCommas(totalInterest.toFixed(2))}`);
   prompt('-------------------------------------------------');
 }
 
-function numCommas(num) {
+function addCommas(num) {
   return num.replace(/\B(?=(\d{3})+(?!\d))/g, ",");
   // I borrowed this regex from StackOverFlow user Elias Zamaria
   // https://stackoverflow.com/questions/2901102/how-to-print-a-number-with-commas-as-thousands-separators-in-javascript
 }
 
-function mortageCalculator () {
-  let loanAmount = collectInput("loan", isInvalidLoanAmount, "invalidLoanMsg");
-  let durationInYears = collectInput("duration", isInvalidDuration, "invalidDurationMsg");
-  let months = durationInYears * 12;
-  let yearlyInterestRate = collectInput("interest", isInvalidInterest, "invalidInterestMsg");
+function calculateMortgage(yearlyInterestRate, loanAmount, months) {
   let monthlyPayment;
   let monthlyInterestRate = (yearlyInterestRate / 100) / 12;
 
@@ -100,9 +76,27 @@ function mortageCalculator () {
   } else {
     monthlyPayment = (loanAmount / months);
   }
+  return monthlyPayment;
+}
 
-  let totalPayments = monthlyPayment * months;
-  let totalInterest = (months * monthlyPayment) - loanAmount;
+function calculateTotalPayments(monthlyPayment, months) {
+  return monthlyPayment * months;
+}
+
+function calculateTotalInterest(months, monthlyPayment, loanAmount) {
+  return (months * monthlyPayment) - loanAmount;
+}
+
+function mortageCalculator () {
+  let loanAmount = collectInput("loan", isInvalidLoanAmount, "invalidLoanMsg");
+  let durationInYears = collectInput("duration", isInvalidDuration, "invalidDurationMsg");
+  let months = durationInYears * 12;
+  let yearlyInterestRate = collectInput("interest", isInvalidInterest, "invalidInterestMsg");
+
+  let monthlyPayment = calculateMortgage(yearlyInterestRate, loanAmount, months);
+
+  let totalPayments = calculateTotalPayments(monthlyPayment, months);
+  let totalInterest = calculateTotalInterest(months, monthlyPayment, loanAmount);
 
   displayResults(monthlyPayment, months, totalInterest, totalPayments);
 }
@@ -113,16 +107,12 @@ function main() {
 
   while (true) {
     mortageCalculator();
-
     let repeatInput = collectInput("repeat", isInvalidRepeat, "invalidRepeatMsg");
-    if (repeatInput === 'no') {
-      break;
-    } else if (repeatInput === 'yes') {
+    if (repeatInput) {
       console.clear();
     } else {
-      prompt(MESSAGES["error"]);
+      break;
     }
   }
 }
-
 main();
