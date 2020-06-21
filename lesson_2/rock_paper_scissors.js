@@ -1,5 +1,9 @@
 const readline = require('readline-sync');
 const VALID_CHOICES = ['rock', 'paper', 'scissors', 'spock', 'lizard'];
+const VALID_PLAY_AGAIN_CHOICES = {
+  yes : ['yes', 'y'],
+  no : ['no', 'n'],
+};
 
 const WINNING_COMBOS = {
   rock    : ['scissors', 'lizard'  ],
@@ -17,7 +21,7 @@ function userWins(choice, computerChoice) {
 }
 
 function displayWinner(choice, computerChoice) {
-  if (userWins) {
+  if (userWins(choice, computerChoice)) {
     prompt('Congrats you win!');
   } else if (choice === computerChoice) {
     prompt("It's a tie!");
@@ -26,32 +30,22 @@ function displayWinner(choice, computerChoice) {
   }
 }
 
-function cleanUserInput(userInput) {
-  if ((userInput[0] !== 's') && (VALID_CHOICES.includes(userInput)) {
-    return userInput;
-  } else {
-    prompt("You entered 's' which could be scissors or spock");
-    prompt("Please specify which move you meant");
-    
-  }
-
-}
-
 function getUserInput() {
   prompt(`Choose one: ${VALID_CHOICES.join(', ')}`);
   let input = readline.question().toLowerCase();
+
   while (!VALID_CHOICES.includes(input)) {
-    prompt("That's not a valid choice");
+    prompt("That's not a valid entry. Please choose from the following -");
+    prompt("(r)ock, (p)aper, (sc)issors, (sp)ock, or (l)izard");
     input = readline.question().toLowerCase();
   }
-
-  let choice = cleanUserInput(input);
-  return choice;
+  return input;
 }
 
 function getComputerChoice() {
   let randomIndex = Math.floor(Math.random() * VALID_CHOICES.length);
   let computerChoice = VALID_CHOICES[randomIndex];
+
   return computerChoice;
 }
 
@@ -59,26 +53,41 @@ function displayChoices(choice, computerChoice) {
   prompt(`You chose ${choice}, computer chose ${computerChoice}`);
 }
 
-function playAgainInput() {
-  prompt('Do you want to play again (y/n)?');
-  let answer = readline.question().toLowerCase();
-  return answer;
-}
 
-while (true) {
+function playGame() {
   let choice = getUserInput();
   let computerChoice = getComputerChoice();
 
   displayChoices(choice, computerChoice);
   displayWinner(choice, computerChoice);
+}
 
-  let answer = playAgainInput();
+function validPlayAgain(input) {
+  let answers = Object.values(VALID_PLAY_AGAIN_CHOICES);
+  let flatAnswers = answers.flat();
+  if (flatAnswers.includes(input)) return true;
+}
 
-  while (answer[0] !== 'n' && answer[0] !== 'y') {
-    prompt('Please enter "y" or "n".');
+function playAgain() {
+  prompt('Do you want to play again (y/n)?');
+  let answer = readline.question().toLowerCase();
+
+  while (!validPlayAgain(answer)) {
+    prompt("That's not a valid choice");
+    prompt("Please enter (y)es or (n)o");
     answer = readline.question().toLowerCase();
   }
 
-  if (answer[0] !== 'y') break;
+  if ((answer === 'no') || (answer === 'n')) {
+    return answer;
+  } else {
+    return null;
+  }
 }
+
+do {
+  playGame();
+  if (playAgain()) break;
+
+} while (true);
 
