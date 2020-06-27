@@ -1,6 +1,3 @@
-// capitalize function?
-
-
 const readline = require('readline-sync');
 const MESSAGES = require('./rock_paper_scissors_messages.json');
 
@@ -45,15 +42,9 @@ const ROUND_SCORE = {
   computer : 0,
 };
 
-
 function prompt(message) {
   console.log(`=> ${message}`);
 }
-
-function userWinsRound(userChoice, computerChoice) {
-  return WINNING_COMBOS[userChoice].includes(computerChoice);
-}
-
 
 function isValidGameChoices(input) {
   let validChoices = Object.values(VALID_GAME_CHOICE_INPUT).flat();
@@ -110,6 +101,10 @@ function displayWinningLogic(userChoice, computerChoice) {
       prompt(key);
     }
   }
+}
+
+function userWinsRound(userChoice, computerChoice) {
+  return WINNING_COMBOS[userChoice].includes(computerChoice);
 }
 
 function displayRoundWinner(userChoice, computerChoice) {
