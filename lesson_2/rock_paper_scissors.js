@@ -1,6 +1,9 @@
 const readline = require('readline-sync');
 const MESSAGES = require('./rock_paper_scissors_messages.json');
 
+const ROUNDS_TO_WIN = 3;
+const MAX_ROUNDS_IN_GAME = 5;
+
 const VALID_GAME_CHOICE_INPUT = {
   rock     : ['rock'    , 'r' ],
   paper    : ['paper'   , 'p' ],
@@ -37,7 +40,7 @@ const WINNING_MESSAGES = {
   'Rock crushes Scissors'       : ['rock'    , 'scissors'],
 };
 
-const ROUND_SCORE = {
+const GAME_SCORE = {
   user : 0,
   computer : 0,
 };
@@ -78,9 +81,9 @@ function getComputerChoice() {
 
 function updateScore(userChoice, computerChoice) {
   if (determineWinner(userChoice, computerChoice) === 'user') {
-    ROUND_SCORE.user += 1;
+    GAME_SCORE.user += 1;
   } else if (determineWinner(userChoice, computerChoice) === 'computer') {
-    ROUND_SCORE.computer += 1;
+    GAME_SCORE.computer += 1;
   }
 }
 
@@ -136,9 +139,9 @@ function showEndOfRoundMessages(userChoice, computerChoice) {
 }
 
 function continuePlaying(round, computerScore, userScore) {
-  if (computerScore === 3 ||
-      userScore     === 3 ||
-      round         === 5) {
+  if (computerScore === ROUNDS_TO_WIN ||
+      userScore     === ROUNDS_TO_WIN ||
+      round         === MAX_ROUNDS_IN_GAME) {
     prompt(MESSAGES["continueToFinalScore"]);
   } else {
     prompt(MESSAGES["continueToNextRound"] + (round + 1));
@@ -173,8 +176,8 @@ function displayScoreBoard(userScore, computerScore, round) {
 }
 
 function playGame() {
-  for (let round = 1; round <= 5; round += 1) {
-    displayScoreBoard(ROUND_SCORE.user, ROUND_SCORE.computer, round);
+  for (let round = 1; round <= MAX_ROUNDS_IN_GAME; round += 1) {
+    displayScoreBoard(GAME_SCORE.user, GAME_SCORE.computer, round);
 
     let userChoice = getUserChoice();
     let computerChoice = getComputerChoice();
@@ -185,12 +188,13 @@ function playGame() {
 
     showEndOfRoundMessages(userChoice, computerChoice);
 
-    continuePlaying(round, ROUND_SCORE.computer, ROUND_SCORE.user);
+    continuePlaying(round, GAME_SCORE.computer, GAME_SCORE.user);
     console.clear();
 
-    if ((ROUND_SCORE.computer === 3) || (ROUND_SCORE.user === 3)) break;
+    if ((GAME_SCORE.computer === ROUNDS_TO_WIN) ||
+        (GAME_SCORE.user === ROUNDS_TO_WIN)) break;
   }
-  displayGameWinner(ROUND_SCORE.computer, ROUND_SCORE.user);
+  displayGameWinner(GAME_SCORE.computer, GAME_SCORE.user);
 }
 
 function isValidPlayAgain(input) {
